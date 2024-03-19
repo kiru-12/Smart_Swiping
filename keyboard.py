@@ -55,14 +55,14 @@ class KeyBoard:
     def getNearestKeyFromPoint(self, p : Point):
         rowIndex = int( p.y // (self.height +  (2* self.padding)) )
         rowIndex  = rowIndex if rowIndex >= 0 else 0
-        rowIndex  = rowIndex if rowIndex < len(self.KEYSLIST) else self.KEYSLIST[-1]
+        rowIndex  = rowIndex if rowIndex < len(self.KEYSLIST) else -1
         keys = self.KEYSLIST[rowIndex]
 
         initalWidthOffset = self.padding if rowIndex == 0 else (self.width - self.padding - (len(keys) * self.WIDTH_OF_KEY)) / 2
 
         x = int((p.x - initalWidthOffset) // self.WIDTH_OF_KEY)
         x = x if x >= 0 else 0
-        x = x if x < len(keys) else keys[-1]
+        x = x if x < len(keys) else -1
         key = keys[x]
 
         return key
@@ -74,18 +74,30 @@ class KeyBoard:
         for char in text:
             char = char.lower()
             if (char != " "):
-                noised_point = self.keysPointsDict.get(char).getNoisedPoint( noise = noise )
+                point =  self.keysPointsDict.get(char)
+                if point is None:
+                    raise Exception("Error  got char :  ",char)
+                noised_point =point.getNoisedPoint( noise = noise )
                 wordPointsList.append(noised_point)
 
-        text = ""
+
+        
+        if ( len(wordPointsList) == 1 ):
+           return text[0]
+
+        sim_text = ""
+        TOTAL_GESTURE_POINTS = 500
+        gesturePointsBetweenTwoChar = TOTAL_GESTURE_POINTS / (len(wordPointsList) - 1)
+
+
 
         for i in range(len( wordPointsList) -1):
             p1 = wordPointsList[i]
             p2 = wordPointsList[ i + 1]
-            points = drawBezierCurve(p1, p2)
+            points = drawBezierCurve(p1, p2, gesturePointsBetweenTwoChar)
 
-            text = self.addAllKeysNearestToCurve(text,points[0], points[1])
+            sim_text = self.addAllKeysNearestToCurve(sim_text,points[0], points[1])
 
-        return text
+        return sim_text
 
 
