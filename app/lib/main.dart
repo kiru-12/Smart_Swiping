@@ -27,19 +27,48 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Smart Swiping"),
-      ),
+      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary, title: const Text("Smart Swiping")),
       body: const Column(
         mainAxisSize: MainAxisSize.max,
         children: [
           // Expanded(child: Center(child: Text(textEditingController.text))),
           Expanded(child: SizedBox()),
-          Center(child: CustomKeyBoard()),
+          MainBody(),
           Expanded(child: SizedBox()),
         ],
       ),
+    );
+  }
+}
+
+class MainBody extends StatefulWidget {
+  const MainBody({super.key});
+
+  @override
+  State<MainBody> createState() => _MainBodyState();
+}
+
+class _MainBodyState extends State<MainBody> {
+  final TextEditingController textEditingController = TextEditingController();
+
+  void setText(Function(TextEditingController) fn) {
+    fn(textEditingController);
+    setState(() {});
+  }
+
+  
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: Text("Gesture to text: ${textEditingController.text}"),
+        ),
+        CustomKeyBoard(setTextFunction: setText),
+      ],
     );
   }
 }
