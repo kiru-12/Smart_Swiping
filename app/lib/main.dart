@@ -41,6 +41,12 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
+typedef TextStateFunction = void Function({
+  required TextEditingController gestureController,
+  required TextEditingController mainTextController,
+  required void Function(void Function()) setState,
+});
+
 class MainBody extends StatefulWidget {
   const MainBody({super.key});
 
@@ -49,14 +55,12 @@ class MainBody extends StatefulWidget {
 }
 
 class _MainBodyState extends State<MainBody> {
-  final TextEditingController textEditingController = TextEditingController();
+  final TextEditingController gestureController = TextEditingController();
+  final TextEditingController mainTextController = TextEditingController();
 
-  void setText(Function(TextEditingController) fn) {
-    fn(textEditingController);
-    setState(() {});
+  void setText(TextStateFunction fn) {
+    fn(gestureController: gestureController, mainTextController: mainTextController, setState: setState);
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +69,11 @@ class _MainBodyState extends State<MainBody> {
       children: [
         Padding(
           padding: const EdgeInsets.all(30.0),
-          child: Text("Gesture to text: ${textEditingController.text}"),
+          child: Text("Text: ${mainTextController.text}"),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: Text("Gesture: ${gestureController.text}"),
         ),
         CustomKeyBoard(setTextFunction: setText),
       ],

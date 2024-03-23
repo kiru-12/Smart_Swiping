@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'dart:async';
+import 'package:app/main.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:app/keyboard.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +10,7 @@ import 'package:flutter/material.dart';
 class CustomKeyBoard extends StatefulWidget {
   const CustomKeyBoard({super.key, required this.setTextFunction});
 
-  final void Function(Function(TextEditingController)) setTextFunction;
+  final void Function(TextStateFunction) setTextFunction;
 
   static getWidthOfKey(BuildContext context) {
     return (MediaQuery.of(context).size.width - (2 * KeyBoard.padding)) / KeyBoard.keysList[0].length;
@@ -23,8 +26,13 @@ class _CustomKeyBoardState extends State<CustomKeyBoard> {
 
   List<Offset?> gestures = [];
   void onUpdate(Offset localPosition, BuildContext context) async {
-    widget.setTextFunction((textContoller) {
-      textContoller.text = KeyBoard.getTextForOffset(context: context, text: textContoller.text, offset: localPosition);
+    widget.setTextFunction(({required gestureController, required mainTextController, required setState}) {
+      gestureController.text = KeyBoard.getTextForOffset(
+        context: context,
+        text: gestureController.text,
+        offset: localPosition,
+      );
+      setState(() {});
     });
 
     setState(() => gestures.add(Offset(localPosition.dx, localPosition.dy)));
@@ -33,8 +41,11 @@ class _CustomKeyBoardState extends State<CustomKeyBoard> {
   }
 
   void onPanEnd(_) async {
-    widget.setTextFunction((textContoller) {
-      textContoller.text = "";
+    widget.setTextFunction(({required gestureController, required mainTextController, required setState}) {
+      final uri = Uri.http("localhost:8000", "/", {"gesture": gestureController.text});
+      http.get(uri).then((value) =>
+          setState(() => mainTextController.text = "${mainTextController.text} ${jsonDecode(value.body)["pred"]}"));
+      gestureController.text = "";
     });
 
     setState(() => gestures.add(null));
