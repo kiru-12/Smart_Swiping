@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from transformers import T5Tokenizer ,T5ForConditionalGeneration
 
-base_path = './../data/results_3x_dataset'
+base_path = './../model'
 trained_model = T5ForConditionalGeneration.from_pretrained(base_path + "/model")
 tokenizer = T5Tokenizer.from_pretrained(base_path  +  '/tokenizer')
 
