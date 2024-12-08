@@ -1,5 +1,3 @@
-Here is a README.md file tailored for your Smart_Swiping GitHub repository:
-
 Smart Swiping: Phrase-Based Gesture Typing
 
 Overview
